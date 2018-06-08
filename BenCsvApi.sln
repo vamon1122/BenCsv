@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCsv", "TestCsv\TestCsv.csproj", "{5F898B4E-C5C9-432F-B749-EEA4057C3880}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenCsv", "BenCsv\BenCsv.csproj", "{C750F321-C05B-4977-99D8-A25362EAD656}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F898B4E-C5C9-432F-B749-EEA4057C3880}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F898B4E-C5C9-432F-B749-EEA4057C3880}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F898B4E-C5C9-432F-B749-EEA4057C3880}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F898B4E-C5C9-432F-B749-EEA4057C3880}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C750F321-C05B-4977-99D8-A25362EAD656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C750F321-C05B-4977-99D8-A25362EAD656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C750F321-C05B-4977-99D8-A25362EAD656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C750F321-C05B-4977-99D8-A25362EAD656}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39F2C851-D7C6-420D-98B7-F5D58EA1E76C}
+	EndGlobalSection
+EndGlobal
