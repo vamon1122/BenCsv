@@ -8,20 +8,25 @@ using BenLog;
 
 namespace BenCsv
 {
-    public static class CsvReader
+    public static class Csv
     {
-        static LogWriter MyLog;
+        private static LogWriter MyLog;
 
-        static CsvReader()
+        static Csv()
         {
             MyLog = new LogWriter("BenCsv.log", AppDomain.CurrentDomain.BaseDirectory);
         }
+
+
+        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+        //Public methods
+
 
         public static bool CanReadFile(string pDir)
         {
             try
             {
-                ParseFile(new StreamReader(pDir));
+                ParseCsvFile(pDir);
             }
             catch
             {
@@ -42,15 +47,68 @@ namespace BenCsv
                 pDir = pDir.Substring(0, pDir.Length - 1);
             }
 
-            return ParseFile(new StreamReader(pDir));
+            return ParseCsvFile(pDir);
         }
 
-        private static List<string[]> ParseFile(StreamReader pReader)
+        public static bool WriteToFile(List<string[]> pRows, string pDir)
+        {
+            try
+            {
+                using(StreamWriter sr = new StreamWriter(pDir))
+                {
+                    sr.WriteLine(GenCsvString(pRows));
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
+        //Private methods
+
+        private static string GenCsvString(List<string[]> pRows)
+        {
+            string CsvString = "";
+
+            foreach(string[] row in pRows)
+            {
+                foreach(string cell in row)
+                {
+                    string newCell = cell;
+                    if (cell.Contains('"'))
+                    {
+                        newCell.Replace("\"", "\"\"");
+                    }
+
+                    if(cell.Contains(" ") || cell.Contains("\"") || cell.Contains(","))
+                    {
+                        //newCell.Insert(1, "\""); This doesn't work for some reason
+                        newCell = '"' + newCell;
+                        newCell += '"';
+                    }
+
+                    CsvString += newCell;
+
+                    if (cell != row.Last())
+                    {
+                        CsvString += ',';
+                    }
+                }
+                CsvString += Environment.NewLine;
+            }
+            return CsvString;
+        }
+
+        private static List<string[]> ParseCsvFile(string pDir)
         {
             MyLog.Info("Parsing CSV file...");
             List<string[]> MyLines = new List<string[]>();
 
-            using (pReader)
+            using (StreamReader pReader = new StreamReader(pDir))
             {
                 while (!pReader.EndOfStream)
                 {
@@ -58,14 +116,14 @@ namespace BenCsv
                     MyLog.Break();
                 }
             }
-            MyLog.Info("Successfully parsed CSV line!");
+            MyLog.Info("Successfully parsed CSV file!");
             return MyLines;
         }
 
         private static string[] ParseCsvLine(string pLine)
         {
-            //MyLog.Info("Parsing CSV line...");
-            //MyLog.Debug(String.Format("Parsing line \"{0}\"", pLine));
+            MyLog.Info("Parsing CSV line...");
+            MyLog.Debug(String.Format("Parsing line \"{0}\"", pLine));
 
             var Line = pLine;
             string[] Values;
@@ -79,7 +137,7 @@ namespace BenCsv
                 {
 
 
-                    //MyLog.Debug(String.Format("LINE VALUE {0}", ValueNo));
+                    MyLog.Debug(String.Format("LINE VALUE {0}", ValueNo));
                     ValueNo++;
 
                     //Get rid of the comma if it's the next value on the line
@@ -97,19 +155,19 @@ namespace BenCsv
                     string ActiveVal;
                     if (Line.Contains(","))
                     {
-                        //MyLog.Debug("There are more commas to parse.");
+                        MyLog.Debug("There are more commas to parse.");
                         ActiveVal = Line.Substring(Zero, Line.IndexOf(","));
                     }
                     else
                     {
-                        //MyLog.Debug("There are NO more commas to parse.");
+                        MyLog.Debug("There are NO more commas to parse.");
                         ActiveVal = Line;
                     }
 
 
-                    //MyLog.Debug(String.Format("NEXT ActiveVal = \"{0}\"", ActiveVal));
+                    MyLog.Debug(String.Format("NEXT ActiveVal = \"{0}\"", ActiveVal));
                     Line = Line.Substring(ActiveVal.Length, Line.Length - ActiveVal.Length);
-                    //MyLog.Debug(String.Format("Meaning that Line now = \"{0}\"", Line));
+                    MyLog.Debug(String.Format("Meaning that Line now = \"{0}\"", Line));
 
                     if (ActiveVal.Contains('"'))
                     {
@@ -117,7 +175,7 @@ namespace BenCsv
                         {
                             if (ActiveVal.Substring(ActiveVal.Length - 1, 1) == "\"" && (ActiveVal.Split('"').Length - 1) % 2 == 0) //Added the second argument because if there is an odd number
                             {                                                                                                       //the string is not complete (some values were being marked
-                                //MyLog.Debug(String.Format("ActiveVal \"{0}\" is already complete!", ActiveVal));                    //as complete when they weren't
+                                MyLog.Debug(String.Format("ActiveVal \"{0}\" is already complete!", ActiveVal));                    //as complete when they weren't
 
                             }
                             else
@@ -140,8 +198,8 @@ namespace BenCsv
                         MyLog.Debug(String.Format("ActiveVal \"{0}\" is NOT complete. Completing ActiveVal...", ActiveVal));
                         if (Line.Contains("\","))
                         {
-                            //MyLog.Debug("Line contains \",");
-                            //MyLog.Debug("Index of \", = " + Line.IndexOf("\","));
+                            MyLog.Debug("Line contains \",");
+                            MyLog.Debug("Index of \", = " + Line.IndexOf("\","));
 
                             ActiveVal += Line.Substring(0, Line.IndexOf("\",") + 1);
                             Line = Line.Substring(Line.IndexOf("\",") + 1, Line.Length - Line.IndexOf("\",") - 1); //Added the +1/-1 because " wasn't being removed
@@ -149,7 +207,7 @@ namespace BenCsv
                         }
                         else
                         {
-                            //MyLog.Debug("Line does not contain \",");
+                            MyLog.Debug("Line does not contain \",");
                             ActiveVal += Line;
                             Line = "";
                         }
@@ -157,14 +215,14 @@ namespace BenCsv
 
                         if ((ActiveVal.Split('"').Length - 1) % 2 != 0)
                         {
-                            //MyLog.Debug(String.Format("ActiveVal still is incomplete. ActiveVal = \"{0}\"", ActiveVal));
-                            //MyLog.Debug(String.Format("Line = \"{0}\"", Line));
+                            MyLog.Debug(String.Format("ActiveVal still is incomplete. ActiveVal = \"{0}\"", ActiveVal));
+                            MyLog.Debug(String.Format("Line = \"{0}\"", Line));
                             CompleteLine();
                         }
                         else
                         {
-                            //MyLog.Debug(String.Format("Completed ActiveVal successfully! ActiveVal = \"{0}\"", ActiveVal));
-                            //MyLog.Debug(String.Format("Line = \"{0}\"", Line));
+                            MyLog.Debug(String.Format("Completed ActiveVal successfully! ActiveVal = \"{0}\"", ActiveVal));
+                            MyLog.Debug(String.Format("Line = \"{0}\"", Line));
                         }
                     }
 
@@ -172,31 +230,31 @@ namespace BenCsv
                     {
                         if (ActiveVal[0] == '"')
                         {
-                            //MyLog.Debug("ActiveVal starts with a quotation mark. Removing quotation mark...");
+                            MyLog.Debug("ActiveVal starts with a quotation mark. Removing quotation mark...");
                             ActiveVal = ActiveVal.Substring(1, ActiveVal.Length - 1);
-                            //MyLog.Debug(String.Format("Successfully removed quotation mark. ActiveVal now = \"{0}\"", ActiveVal));
+                            MyLog.Debug(String.Format("Successfully removed quotation mark. ActiveVal now = \"{0}\"", ActiveVal));
 
                         }
 
                         if (ActiveVal.Last() == '"')
                         {
-                            //MyLog.Debug("ActiveVal ends with a quotation mark. Removing quotation mark.");
+                            MyLog.Debug("ActiveVal ends with a quotation mark. Removing quotation mark.");
                             ActiveVal = ActiveVal.Substring(0, ActiveVal.Length - 1);
-                            //MyLog.Debug(String.Format("Successfully removed quotation mark. ActiveVal now = \"{0}\"", ActiveVal));
+                            MyLog.Debug(String.Format("Successfully removed quotation mark. ActiveVal now = \"{0}\"", ActiveVal));
                         }
 
                         //Quotation marks (") are saved as ("") in CSV files. This changes them back to (")
                         if (ActiveVal.Contains('"'))
                         {
-                            //MyLog.Debug("Formatting quotation marks...");
+                            MyLog.Debug("Formatting quotation marks...");
                             ActiveVal = ActiveVal.Replace("\"\"", "\"");
-                            //MyLog.Debug(String.Format("Formatted quotation marks successfully! ActiveVal now = \"{0}\"", ActiveVal));
+                            MyLog.Debug(String.Format("Formatted quotation marks successfully! ActiveVal now = \"{0}\"", ActiveVal));
                         }
                     }
 
-                    //MyLog.Debug("Adding string to TempValues...");
+                    MyLog.Debug("Adding string to TempValues...");
                     TempValues.Add(ActiveVal);
-                    //MyLog.Debug("Successfully added string to TempValues");
+                    MyLog.Debug("Successfully added string to TempValues");
                 }
                 Values = TempValues.ToArray();
                 return Values;

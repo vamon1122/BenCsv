@@ -1,0 +1,5 @@
+﻿
+1.0.1 
+ - Re-enabled logging
+ - Downgraded to .NET 4.0 for better compatibility
+ - Renamed everything
